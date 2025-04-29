@@ -3,7 +3,7 @@ MySql Navigator.
 # MySQL Navigator - README
 
 ## **Overview**
-MySQL Navigator is an AI generated batch script designed to simplify MySQL database management tasks. It provides a user-friendly interface for performing common operations such as running queries, listing databases, exporting/importing databases, and backing up databases.
+MySQL Navigator is batch script designed with the help of Artificial Intelligence to simplify MySQL database management tasks using CMD. It provides a user-friendly interface for performing common operations such as running queries, listing databases, exporting/importing databases, and backing up databases.
 
 ---
 
