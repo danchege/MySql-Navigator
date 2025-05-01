@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 # MySQL Navigator
 
 ## Overview
 MySQL Navigator is a command-line tool designed to simplify MySQL database management. It provides an interactive menu-driven interface for performing common database operations such as running queries, managing databases, and handling tables. This tool is written in a batch script and requires MySQL to be installed and accessible via the system's PATH.
+=======
+# MySQL Navigator 
+
+## **Overview**
+MySQL Navigator is batch script designed with the help of Artificial Intelligence to simplify MySQL database management tasks using CMD. It provides a user-friendly interface for performing common operations such as running queries, listing databases, exporting/importing databases, and backing up databases.
+>>>>>>> 9b871d0006013fa0ddde9d31add27b5b8fd47ca3
 
 ---
 
