@@ -102,15 +102,24 @@ if not defined current_db (
     pause
     goto CONTINUOUS_OPERATIONS
 )
-set /p "query=Enter your SQL query: "
+
+:QUERY_LOOP
+set /p "query=Enter your SQL query (or type EXIT to return to the main menu): "
+if /i "%query%"=="EXIT" goto CONTINUOUS_OPERATIONS
 if "%query%"=="" (
     echo ERROR: No query specified.
     pause
-    goto CONTINUOUS_OPERATIONS
+    goto QUERY_LOOP
 )
+
 mysql %auth_cmd% -D %current_db% -e "%query%"
+if errorlevel 1 (
+    echo ERROR: Failed to execute query. Please check your syntax.
+) else (
+    echo Query executed successfully.
+)
 pause
-goto CONTINUOUS_OPERATIONS
+goto QUERY_LOOP
 
 :SELECT_DATABASE
 cls
@@ -353,11 +362,6 @@ echo  --------------------------------------------------
 echo               IMPORT DATABASE
 echo  --------------------------------------------------
 echo.
-if not defined current_db (
-    echo ERROR: Please select a database first.
-    pause
-    goto CONTINUOUS_OPERATIONS
-)
 echo Available import files in imports directory:
 dir /b "imports\*.sql"
 echo.
@@ -367,16 +371,57 @@ if "%import_file%"=="" (
     pause
     goto CONTINUOUS_OPERATIONS
 )
+
+:: Append .sql extension if not provided
+if /i "%import_file:~-4%" NEQ ".sql" set "import_file=%import_file%.sql"
+
 if not exist "imports\%import_file%" (
     echo ERROR: File not found: imports\%import_file%
     pause
     goto CONTINUOUS_OPERATIONS
 )
+
+echo.
+choice /c CN /n /m "Do you want to (C)reate a new database or (N)ot? "
+if errorlevel 2 goto IMPORT_TO_EXISTING
+
+:CREATE_NEW_DATABASE
+set /p "new_db=Enter the name of the new database to create: "
+if "%new_db%"=="" (
+    echo ERROR: No database name specified.
+    pause
+    goto CONTINUOUS_OPERATIONS
+)
+
+:: Create the new database
+mysql %auth_cmd% -e "CREATE DATABASE %new_db%;" >nul 2>&1
+if errorlevel 1 (
+    echo ERROR: Failed to create database '%new_db%'. It may already exist.
+    pause
+    goto CONTINUOUS_OPERATIONS
+)
+
+:: Use the new database for import
+set "current_db=%new_db%"
+echo Database '%new_db%' created successfully.
+goto IMPORT_FILE
+
+:IMPORT_TO_EXISTING
+if not defined current_db (
+    echo ERROR: No database selected. Please select a database first.
+    pause
+    goto CONTINUOUS_OPERATIONS
+)
+
+:IMPORT_FILE
+echo Importing into database: %current_db%
 mysql %auth_cmd% %current_db% < "imports\%import_file%"
 if errorlevel 1 (
     echo ERROR: Import failed.
 ) else (
     echo Database imported successfully.
+    echo Refreshing database list...
+    mysql %auth_cmd% -e "SHOW DATABASES;"
 )
 pause
 goto CONTINUOUS_OPERATIONS
